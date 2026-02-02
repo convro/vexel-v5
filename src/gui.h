@@ -142,7 +142,7 @@ public:
         activeTab = 0; // config tab first
         ResizeWindow(Theme::WinW, Theme::WinH);
         // Refresh process list
-        processes = EnumMinecraftProcesses();
+        processes = EnumVisibleWindows();
         InvalidateRect(hwnd, nullptr, TRUE);
     }
 
@@ -366,7 +366,7 @@ public:
         } else if (activeTab == 1) {
             if (!processConfirmed) {
                 Gdiplus::RectF msgRc(0, (float)contentY + 40, (float)w, 30);
-                g.DrawString(L"Select and confirm a Minecraft process in Config first.",
+                g.DrawString(L"Select and confirm a target window in Config first.",
                     -1, &smallFont, msgRc, &sfCenter, &secBr);
             } else {
                 PaintCombatTab(g, 10, contentY, w - 20, contentH);
@@ -400,7 +400,7 @@ public:
 
         // Section title
         Gdiplus::RectF titleRc((float)x, (float)y, (float)w, 24);
-        g.DrawString(L"Select Minecraft Process", -1, &labelFont, titleRc, &sfLeft, &textBr);
+        g.DrawString(L"Select Target Window", -1, &labelFont, titleRc, &sfLeft, &textBr);
 
         // Refresh button
         int refX = x + w - 80, refY = y;
@@ -425,7 +425,7 @@ public:
 
         if (processes.empty()) {
             Gdiplus::RectF emptyRc((float)x, (float)listY, (float)w, (float)listH);
-            g.DrawString(L"No Minecraft windows found. Open Minecraft and click Refresh.",
+            g.DrawString(L"No windows found. Click Refresh to scan.",
                 -1, &itemFont, emptyRc, &sfC, &secBr);
         } else {
             int itemH = 36;
@@ -797,7 +797,7 @@ public:
         // Refresh button
         int refX = x + w - 80;
         if (mx >= refX && mx <= refX + 80 && my >= contentY && my <= contentY + 24) {
-            processes = EnumMinecraftProcesses();
+            processes = EnumVisibleWindows();
             selectedProcess = -1;
             processConfirmed = false;
             return;

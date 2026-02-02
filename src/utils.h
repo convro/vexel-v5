@@ -11,10 +11,9 @@ struct ProcessInfo {
     std::wstring windowTitle;
 };
 
-inline std::vector<ProcessInfo> EnumMinecraftProcesses() {
+inline std::vector<ProcessInfo> EnumVisibleWindows() {
     std::vector<ProcessInfo> results;
 
-    // Find windows with "Minecraft" in title
     struct Ctx { std::vector<ProcessInfo>* r; };
     Ctx ctx{ &results };
 
@@ -23,15 +22,15 @@ inline std::vector<ProcessInfo> EnumMinecraftProcesses() {
         wchar_t title[512];
         GetWindowTextW(hwnd, title, 512);
         std::wstring t(title);
-        // Accept windows with Minecraft in the title
-        std::wstring tLow = t;
-        std::transform(tLow.begin(), tLow.end(), tLow.begin(), ::towlower);
-        if (tLow.find(L"minecraft") != std::wstring::npos) {
-            DWORD pid = 0;
-            GetWindowThreadProcessId(hwnd, &pid);
-            auto* ctx = reinterpret_cast<Ctx*>(lp);
-            ctx->r->push_back({ pid, L"", t });
-        }
+        if (t.empty()) return TRUE;
+        // Skip tiny/tool windows
+        LONG style = GetWindowLongW(hwnd, GWL_STYLE);
+        if (!(style & WS_CAPTION)) return TRUE;
+
+        DWORD pid = 0;
+        GetWindowThreadProcessId(hwnd, &pid);
+        auto* ctx = reinterpret_cast<Ctx*>(lp);
+        ctx->r->push_back({ pid, L"", t });
         return TRUE;
     }, (LPARAM)&ctx);
 
