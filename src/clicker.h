@@ -4,6 +4,7 @@
 #include <atomic>
 #include <random>
 #include <cmath>
+#include <algorithm>
 #include "config.h"
 
 class Clicker {
@@ -79,7 +80,7 @@ private:
             // Split delay into small sleeps so we can stop quickly
             int slept = 0;
             while (slept < delayMs && m_running.load() && sec.active) {
-                int chunk = min(10, delayMs - slept);
+                int chunk = (std::min)(10, delayMs - slept);
                 Sleep(chunk);
                 slept += chunk;
             }

@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include <objidl.h>
 #include <gdiplus.h>
 
 namespace Theme {
