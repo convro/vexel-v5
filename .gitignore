@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.ncb
+*.opensdf
+*.sdf
+*.aps
+*.log
+Debug/
+Release/
+x64/
