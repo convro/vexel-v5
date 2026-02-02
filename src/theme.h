@@ -37,8 +37,8 @@ namespace Theme {
     inline Gdiplus::Color GdipDanger()      { return Gdiplus::Color(255, 220, 60, 60); }
 
     // Layout
-    inline constexpr int WinW = 680;
-    inline constexpr int WinH = 520;
+    inline constexpr int WinW = 700;
+    inline constexpr int WinH = 580;
     inline constexpr int LoadWinW = 420;
     inline constexpr int LoadWinH = 220;
     inline constexpr int TabBarH = 42;

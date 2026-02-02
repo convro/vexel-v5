@@ -9,6 +9,7 @@ struct ClickSection {
     int   mode         = 0;        // 0 = basic, 1 = pro
     bool  active       = false;    // clicker currently on
     bool  waitingBind  = false;    // waiting for user to press a key
+    float randomizer   = 0.0f;    // 0-100%, CPS variance range
 };
 
 struct AppConfig {
@@ -19,4 +20,13 @@ struct AppConfig {
 
     ClickSection left;
     ClickSection right;
+
+    // Auto Guard (right-clicks during left clicking)
+    bool  autoGuard       = false;
+    float autoGuardRate   = 20.0f;  // 0-100% chance per click cycle
+
+    // Overlay
+    bool  overlayEnabled  = false;
+    int   overlayX        = 10;
+    int   overlayY        = 10;
 };
