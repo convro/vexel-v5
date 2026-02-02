@@ -43,19 +43,28 @@ private:
                 }
             }
 
-            // Pro mode: only click while mouse button is held
+            // Pro mode: only click while the physical mouse button is held.
+            // Use GetKeyState on the message-queue level; our synthetic
+            // up/down from DoReclick won't fool it because it checks the
+            // hardware-reported state at the time of the last input msg.
             if (sec.mode == 1) {
-                bool btnDown = isLeft
-                    ? (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0
-                    : (GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
-                if (!btnDown) {
-                    Sleep(5);
+                int vkBtn = isLeft ? VK_LBUTTON : VK_RBUTTON;
+                bool physDown = (GetAsyncKeyState(vkBtn) & 0x8000) != 0;
+                if (!physDown) {
+                    Sleep(10);
                     continue;
                 }
             }
 
             // Click
-            DoClick(isLeft);
+            if (sec.mode == 1) {
+                // Pro mode: release-repress to simulate clicks while
+                // the physical button stays held. A full down+up would
+                // cancel the physical hold and confuse GetAsyncKeyState.
+                DoReclick(isLeft);
+            } else {
+                DoClick(isLeft);
+            }
 
             // Jitter
             if (sec.jitter) {
@@ -88,6 +97,7 @@ private:
         m_running = false;
     }
 
+    // Basic mode: full click (down + up)
     void DoClick(bool isLeft) {
         INPUT inputs[2]{};
         inputs[0].type = INPUT_MOUSE;
@@ -100,5 +110,22 @@ private:
             inputs[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
         }
         SendInput(2, inputs, sizeof(INPUT));
+    }
+
+    // Pro mode: up then down - simulates a re-click while user
+    // physically holds the button. The game registers a new click
+    // but the physical hold is preserved for GetAsyncKeyState.
+    void DoReclick(bool isLeft) {
+        INPUT up{};
+        up.type = INPUT_MOUSE;
+        up.mi.dwFlags = isLeft ? MOUSEEVENTF_LEFTUP : MOUSEEVENTF_RIGHTUP;
+        SendInput(1, &up, sizeof(INPUT));
+
+        Sleep(1); // tiny gap so the game registers the release
+
+        INPUT down{};
+        down.type = INPUT_MOUSE;
+        down.mi.dwFlags = isLeft ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_RIGHTDOWN;
+        SendInput(1, &down, sizeof(INPUT));
     }
 };
